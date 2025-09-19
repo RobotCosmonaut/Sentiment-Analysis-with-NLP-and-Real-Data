@@ -1,0 +1,16 @@
+@startuml
+class BBCTextScraper {
+    get_article_links()
+    scrape_article_text()
+    preprocess_text()
+    classify_sentiment()
+    analyze_articles()
+    load_existing_data()
+    print_summary_and_verdict()
+    create_bar_chart()
+    main()
+        stop_words
+    sia
+    __init__()
+}
+@enduml

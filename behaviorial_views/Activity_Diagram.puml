@@ -1,0 +1,85 @@
+@startuml BBC_Sentiment_Analysis_Activity
+!theme plain
+title BBC Text Data Collection and Sentiment Analysis - Activity Diagram
+
+start
+
+:Download NLTK Data;
+
+:Check for existing CSV file;
+
+if (CSV exists?) then (yes)
+  :Load data from CSV;
+  :Convert sentiment scores;
+else (no)
+  :Initialize BBCTextScraper;
+  :Setup components;
+  :Send GET request to BBC;
+  
+  if (Request OK?) then (yes)
+    :Parse HTML with BeautifulSoup;
+    :Find article links;
+    :Filter and deduplicate URLs;
+    
+    if (Links found?) then (yes)
+      :Initialize results list;
+      
+      while (More articles?) is (yes)
+        :Get article URL;
+        :Request article content;
+        
+        if (Article OK?) then (yes)
+          :Extract title and text;
+          :Preprocess text;
+          :Analyze sentiment with VADER;
+          :Classify sentiment;
+          :Store results;
+        else (no)
+          :Skip article;
+        endif
+        
+        :Wait 1 second;
+      endwhile (no)
+      
+      :Create DataFrame;
+    else (no)
+      :Print error;
+      stop
+    endif
+  else (no)
+    :Print error;
+    stop
+  endif
+endif
+
+if (Have results?) then (yes)
+  :Display article details;
+  :Count sentiments;
+  
+  if (Positive > Negative?) then (yes)
+    :Verdict = "Happier";
+  elseif (Negative > Positive?) then (yes)
+    :Verdict = "Sadder";
+  else (equal)
+    :Verdict = "Tied";
+  endif
+  
+  :Print summary format;
+  :Calculate averages;
+  :Create bar chart;
+  :Save chart to PNG;
+  :Display chart;
+  
+  if (New data?) then (yes)
+    :Save to CSV;
+  endif
+else (no)
+  :Print no results;
+  stop
+endif
+
+:Script complete;
+
+stop
+
+@enduml

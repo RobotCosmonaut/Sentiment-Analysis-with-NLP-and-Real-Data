@@ -1,0 +1,119 @@
+@startuml BBC_Sentiment_Analysis_Sequence
+!theme plain
+title BBC Text Data Collection and Sentiment Analysis - Sequence Diagram
+
+actor User
+participant "Main Function" as Main
+participant "Data Loader" as Loader
+participant "BBCTextScraper" as Scraper
+participant "NLTK Downloads" as NLTK
+participant "BBC Website" as BBC
+participant "BeautifulSoup" as BS
+participant "SentimentIntensityAnalyzer" as SIA
+participant "Pandas DataFrame" as DF
+participant "Summary Function" as Summary
+participant "Chart Function" as Chart
+participant "Matplotlib" as PLT
+participant "File System" as FS
+
+User -> Main: Execute script
+Main -> NLTK: Download required data\n(punkt, stopwords, vader_lexicon)
+NLTK --> Main: Download complete
+
+Main -> Loader: load_existing_data()
+Loader -> FS: Check for 'bbc_sentiment_analysis.csv'
+
+alt CSV file exists
+    FS --> Loader: File found
+    Loader -> FS: Read CSV data
+    FS --> Loader: Return DataFrame
+    Loader --> Main: Existing data loaded
+else CSV file not found
+    FS --> Loader: File not found
+    Loader --> Main: None (no existing data)
+    
+    Main -> Scraper: Initialize BBCTextScraper()
+    Scraper -> NLTK: Initialize stopwords & SentimentIntensityAnalyzer
+    NLTK --> Scraper: Components ready
+    Scraper --> Main: Scraper initialized
+    
+    Main -> Scraper: analyze_articles(section='news', max_articles=20)
+    
+    Scraper -> Scraper: get_article_links(section, max_links)
+    Scraper -> BBC: GET request to BBC news page
+    BBC --> Scraper: HTML response
+    Scraper -> BS: Parse HTML content
+    BS --> Scraper: Parsed soup object
+    Scraper -> BS: Find article links using selectors
+    BS --> Scraper: List of article URLs
+    Scraper --> Scraper: Filtered unique URLs
+    
+    loop For each article URL (up to 20)
+        Scraper -> Scraper: scrape_article_text(url)
+        Scraper -> BBC: GET request to article URL
+        BBC --> Scraper: Article HTML
+        Scraper -> BS: Parse article content
+        BS --> Scraper: Title and text content
+        Scraper --> Scraper: Article data extracted
+        
+        Scraper -> Scraper: preprocess_text(text)
+        Scraper -> NLTK: Tokenize and filter text
+        NLTK --> Scraper: Processed tokens
+        
+        Scraper -> Scraper: classify_sentiment(text)
+        Scraper -> SIA: polarity_scores(text)
+        SIA --> Scraper: Sentiment scores (pos, neg, neu, compound)
+        Scraper --> Scraper: Classify as Positive/Negative/Mixed/Neutral
+        
+        Scraper --> Scraper: Store result with sentiment data
+        Scraper -> Scraper: time.sleep(1) - Rate limiting
+    end
+    
+    Scraper --> Main: List of analyzed articles
+    Main -> DF: Create DataFrame from results
+    DF --> Main: DataFrame created
+end
+
+Main -> Main: Display individual article results
+loop For each article
+    Main -> User: Print article details\n(title, sentiment, scores, preview)
+end
+
+Main -> Summary: print_summary_and_verdict(df)
+Summary -> DF: Get sentiment value_counts()
+DF --> Summary: Sentiment distribution
+Summary -> Summary: Calculate Positive/Negative/Mixed/Neutral counts
+Summary -> Summary: Determine verdict (Happier/Sadder/Tied)
+Summary -> User: Print summary: "Positive=X Negative=Y Mixed=Z Neutral=W Verdict: X"
+Summary --> Main: Sentiment summary data
+
+Main -> Main: Display detailed statistics
+Main -> User: Print percentage breakdown and average scores
+
+Main -> Chart: create_bar_chart(sentiment_summary)
+Chart -> PLT: Create figure and bar chart
+PLT --> Chart: Figure created
+Chart -> PLT: Customize chart (title, colors, labels)
+Chart -> PLT: Add value labels on bars
+Chart -> PLT: Add verdict as subtitle
+Chart -> PLT: Apply tight_layout()
+Chart -> PLT: savefig('sentiment_analysis_chart.png')
+PLT -> FS: Save PNG file
+FS --> PLT: File saved
+Chart -> User: Print "Chart saved as 'sentiment_analysis_chart.png'"
+Chart -> PLT: show() - Display interactive chart
+PLT -> User: Display chart window
+Chart --> Main: Chart complete
+
+alt New data was scraped
+    Main -> FS: Check if CSV doesn't exist
+    FS --> Main: File status
+    Main -> DF: to_csv('bbc_sentiment_analysis.csv')
+    DF -> FS: Save CSV file
+    FS --> DF: File saved
+    Main -> User: Print "New results saved to CSV"
+end
+
+Main --> User: Script execution complete
+
+@enduml
