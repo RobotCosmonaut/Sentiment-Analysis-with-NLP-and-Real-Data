@@ -1,0 +1,92 @@
+==============================================================================
+PARTITION TEST RESULTS
+==============================================================================
+Run started:     2026-09-29 18:53:12
+Unit under test: BBCTextScraper.classify_sentiment(self, text)
+Source file:     SentimentAnalysisNLP.py
+Subsets run:     S2
+Python:          3.13.5
+Pytest:          8.3.4
+
+Input domain: {all strings} ∪ {None}
+
+Subsets:
+  S1 ≡ {x : x = "" ∨ x = None}  -> Neutral
+  S2 ≡ {x : x ≠ "" ∧ pos_score(x) > 0.3 ∧ neg_score(x) > 0.3}  -> Mixed
+  S3 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ compound(x) ≥ 0.05}  -> Positive
+  S4 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ compound(x) ≤ -0.05}  -> Negative
+  S5 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ -0.05 < compound(x) < 0.05}  -> Neutral
+
+==============================================================================
+TestS2Mixed
+==============================================================================
+
+[1] test_S2_01_strong_pos_and_neg_words
+    Outcome:        PASSED  (0.000s)
+    Subset:         S2
+    Definition:     S2 ≡ {x : x ≠ "" ∧ pos_score(x) > 0.3 ∧ neg_score(x) > 0.3}
+    Input:          'Great joy, terrible grief.'
+    Rationale:      Two strong positive and two strong negative words; no neutral words.
+    Score source:   VADER (real)
+    Scores:         {'neg': 0.444, 'neu': 0.0, 'pos': 0.556, 'compound': 0.3818}
+    Membership:     satisfies ['S2']
+    Expected:       Mixed
+    Actual:         Mixed
+
+[2] test_S2_02_short_mixed_positive_compound
+    Outcome:        PASSED  (0.000s)
+    Subset:         S2
+    Definition:     S2 ≡ {x : x ≠ "" ∧ pos_score(x) > 0.3 ∧ neg_score(x) > 0.3}
+    Input:          'Love and hate.'
+    Rationale:      Mixed with a positive compound: S2 is checked before the compound thresholds.
+    Score source:   VADER (real)
+    Scores:         {'neg': 0.416, 'neu': 0.112, 'pos': 0.472, 'compound': 0.128}
+    Membership:     satisfies ['S2']
+    Expected:       Mixed
+    Actual:         Mixed
+
+[3] test_S2_03_short_mixed_negative_compound
+    Outcome:        PASSED  (0.000s)
+    Subset:         S2
+    Definition:     S2 ≡ {x : x ≠ "" ∧ pos_score(x) > 0.3 ∧ neg_score(x) > 0.3}
+    Input:          'Happy but sad.'
+    Rationale:      Mixed with a negative compound: S2 is checked before the compound thresholds.
+    Score source:   VADER (real)
+    Scores:         {'neg': 0.553, 'neu': 0.133, 'pos': 0.313, 'compound': -0.4215}
+    Membership:     satisfies ['S2']
+    Expected:       Mixed
+    Actual:         Mixed
+
+[4] test_S2_04_controlled_positive_compound
+    Outcome:        PASSED  (0.001s)
+    Subset:         S2
+    Definition:     S2 ≡ {x : x ≠ "" ∧ pos_score(x) > 0.3 ∧ neg_score(x) > 0.3}
+    Input:          'non-empty placeholder text'
+    Rationale:      Chosen scores: compound alone would place x in S3, but S2 applies first.
+    Score source:   mocked (chosen score values)
+    Scores:         {'pos': 0.5, 'neg': 0.4, 'neu': 0.1, 'compound': 0.2}
+    Membership:     satisfies ['S2']
+    Expected:       Mixed
+    Actual:         Mixed
+
+[5] test_S2_05_controlled_negative_compound
+    Outcome:        PASSED  (0.000s)
+    Subset:         S2
+    Definition:     S2 ≡ {x : x ≠ "" ∧ pos_score(x) > 0.3 ∧ neg_score(x) > 0.3}
+    Input:          'non-empty placeholder text'
+    Rationale:      Chosen scores: compound alone would place x in S4, but S2 applies first.
+    Score source:   mocked (chosen score values)
+    Scores:         {'pos': 0.35, 'neg': 0.55, 'neu': 0.1, 'compound': -0.4}
+    Membership:     satisfies ['S2']
+    Expected:       Mixed
+    Actual:         Mixed
+
+==============================================================================
+SUMMARY
+==============================================================================
+  TestS2Mixed        passed  5   failed  0   skipped  0
+
+Total tests: 5
+Passed:      5
+Failed:      0
+Skipped:     0

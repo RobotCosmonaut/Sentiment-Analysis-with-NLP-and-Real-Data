@@ -1,0 +1,92 @@
+==============================================================================
+PARTITION TEST RESULTS
+==============================================================================
+Run started:     2026-09-29 19:09:01
+Unit under test: BBCTextScraper.classify_sentiment(self, text)
+Source file:     SentimentAnalysisNLP.py
+Subsets run:     S4
+Python:          3.13.5
+Pytest:          8.3.4
+
+Input domain: {all strings} ∪ {None}
+
+Subsets:
+  S1 ≡ {x : x = "" ∨ x = None}  -> Neutral
+  S2 ≡ {x : x ≠ "" ∧ pos_score(x) > 0.3 ∧ neg_score(x) > 0.3}  -> Mixed
+  S3 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ compound(x) ≥ 0.05}  -> Positive
+  S4 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ compound(x) ≤ -0.05}  -> Negative
+  S5 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ -0.05 < compound(x) < 0.05}  -> Neutral
+
+==============================================================================
+TestS4Negative
+==============================================================================
+
+[1] test_S4_01_strongly_negative
+    Outcome:        PASSED  (0.000s)
+    Subset:         S4
+    Definition:     S4 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ compound(x) ≤ -0.05}
+    Input:          'The attack killed dozens.'
+    Rationale:      Strongly negative words only.
+    Score source:   VADER (real)
+    Scores:         {'neg': 0.792, 'neu': 0.208, 'pos': 0.0, 'compound': -0.8225}
+    Membership:     satisfies ['S4']
+    Expected:       Negative
+    Actual:         Negative
+
+[2] test_S4_02_negative_news_sentence
+    Outcome:        PASSED  (0.000s)
+    Subset:         S4
+    Definition:     S4 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ compound(x) ≤ -0.05}
+    Input:          'The flood destroyed homes and left families grieving.'
+    Rationale:      Negative news-style sentence.
+    Score source:   VADER (real)
+    Scores:         {'neg': 0.52, 'neu': 0.48, 'pos': 0.0, 'compound': -0.7579}
+    Membership:     satisfies ['S4']
+    Expected:       Negative
+    Actual:         Negative
+
+[3] test_S4_03_positive_word_but_negative_overall
+    Outcome:        PASSED  (0.000s)
+    Subset:         S4
+    Definition:     S4 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ compound(x) ≤ -0.05}
+    Input:          'The food was good but the service was terrible.'
+    Rationale:      Contains a positive word, but pos_score <= 0.3 and compound is negative.
+    Score source:   VADER (real)
+    Scores:         {'neg': 0.317, 'neu': 0.534, 'pos': 0.149, 'compound': -0.4939}
+    Membership:     satisfies ['S4']
+    Expected:       Negative
+    Actual:         Negative
+
+[4] test_S4_04_controlled_neg_high_pos_low
+    Outcome:        PASSED  (0.001s)
+    Subset:         S4
+    Definition:     S4 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ compound(x) ≤ -0.05}
+    Input:          'non-empty placeholder text'
+    Rationale:      neg_score > 0.3 but pos_score <= 0.3, so not Mixed.
+    Score source:   mocked (chosen score values)
+    Scores:         {'pos': 0.1, 'neg': 0.4, 'neu': 0.5, 'compound': -0.6}
+    Membership:     satisfies ['S4']
+    Expected:       Negative
+    Actual:         Negative
+
+[5] test_S4_05_controlled_negative_only
+    Outcome:        PASSED  (0.001s)
+    Subset:         S4
+    Definition:     S4 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ compound(x) ≤ -0.05}
+    Input:          'non-empty placeholder text'
+    Rationale:      No positive content at all.
+    Score source:   mocked (chosen score values)
+    Scores:         {'pos': 0.0, 'neg': 0.6, 'neu': 0.4, 'compound': -0.8}
+    Membership:     satisfies ['S4']
+    Expected:       Negative
+    Actual:         Negative
+
+==============================================================================
+SUMMARY
+==============================================================================
+  TestS4Negative     passed  5   failed  0   skipped  0
+
+Total tests: 5
+Passed:      5
+Failed:      0
+Skipped:     0

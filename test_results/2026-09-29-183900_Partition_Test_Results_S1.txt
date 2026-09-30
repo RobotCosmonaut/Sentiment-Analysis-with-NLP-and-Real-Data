@@ -1,0 +1,54 @@
+==============================================================================
+PARTITION TEST RESULTS
+==============================================================================
+Run started:     2026-09-29 18:39:00
+Unit under test: BBCTextScraper.classify_sentiment(self, text)
+Source file:     SentimentAnalysisNLP.py
+Subsets run:     S1
+Python:          3.13.5
+Pytest:          8.3.4
+
+Input domain: {all strings} ∪ {None}
+
+Subsets:
+  S1 ≡ {x : x = "" ∨ x = None}  -> Neutral
+  S2 ≡ {x : x ≠ "" ∧ pos_score(x) > 0.3 ∧ neg_score(x) > 0.3}  -> Mixed
+  S3 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ compound(x) ≥ 0.05}  -> Positive
+  S4 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ compound(x) ≤ -0.05}  -> Negative
+  S5 ≡ {x : x ≠ "" ∧ ¬(pos_score(x)>0.3 ∧ neg_score(x)>0.3) ∧ -0.05 < compound(x) < 0.05}  -> Neutral
+
+==============================================================================
+TestS1EmptyText
+==============================================================================
+
+[1] test_S1_01_empty_string
+    Outcome:        PASSED  (0.000s)
+    Subset:         S1
+    Definition:     S1 ≡ {x : x = "" ∨ x = None}
+    Input:          ''
+    Rationale:      Empty string: the only string in S1 (page yielded no qualifying text).
+    Scores:         {'compound': 0, 'pos': 0, 'neu': 1, 'neg': 0}
+    Membership:     x is empty or None -> in S1
+    Expected:       Neutral
+    Actual:         Neutral
+
+[2] test_S1_02_none
+    Outcome:        PASSED  (0.000s)
+    Subset:         S1
+    Definition:     S1 ≡ {x : x = "" ∨ x = None}
+    Input:          None
+    Rationale:      None: absence of a value, handled by the same check as the empty string.
+    Scores:         {'compound': 0, 'pos': 0, 'neu': 1, 'neg': 0}
+    Membership:     x is empty or None -> in S1
+    Expected:       Neutral
+    Actual:         Neutral
+
+==============================================================================
+SUMMARY
+==============================================================================
+  TestS1EmptyText    passed  2   failed  0   skipped  0
+
+Total tests: 2
+Passed:      2
+Failed:      0
+Skipped:     0
